@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tool Report Calculating</title>
+    <link rel="icon" href="logo.png" type="image/png" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -25,9 +26,13 @@
             /></label>
           </div>
           <div class="mb-3">
-            <label for="lead_oo" class="form-label w-100"
-              >LEAD OO:
-              <input type="number" class="form-control" id="lead_oo" required
+            <label for="lead_scalev" class="form-label w-100"
+              >LEAD SCALEV:
+              <input
+                type="number"
+                class="form-control"
+                id="lead_scalev"
+                required
             /></label>
           </div>
           <div class="mb-3">
@@ -42,12 +47,28 @@
               <input type="number" class="form-control" id="omset" required
             /></label>
           </div>
+          <div class="mb-2">
+            <button
+              type="submit"
+              class="btn btn-primary w-100"
+              onclick="scroll"
+              id="scrollButton"
+            >
+              Hitung
+            </button>
+          </div>
           <div class="mb-3">
-            <button type="submit" class="btn btn-primary w-100">Hitung</button>
+            <button
+              type="submit"
+              class="btn btn-warning w-100"
+              onclick="reloadPage()"
+            >
+              Refresh
+            </button>
           </div>
         </form>
         <div class="mt-4 border rounded shadow p-4 bg-white">
-          <h3>Hasil:</h3>
+          <h3 id="hasil">Hasil:</h3>
           <pre id="output" class="border rounded-1 p-3">Belum ada hasil.</pre>
           <button onclick="salinHasil()" class="btn btn-success w-100">
             Salin Hasil
@@ -59,6 +80,18 @@
     <script>
       let teksTersusun = ""; // Disimpan global agar bisa disalin
 
+      function reloadPage() {
+        location.reload();
+      }
+
+      const button = document.getElementById("scrollButton");
+      button.addEventListener("click", () => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+      });
+
       function formatTanggalSekarang() {
         const hariList = [
           "Minggu",
@@ -69,12 +102,52 @@
           "Jumat",
           "Sabtu",
         ];
-        const today = new Date();
+
+        let today = new Date();
+        let jam = today.getHours();
+        let menit = today.getMinutes();
+
+        // Kondisi khusus jam 00:00 - 07:00
+        if (jam >= 0 && jam < 8) {
+          // Geser tanggal ke kemarin
+          today.setDate(today.getDate() - 1);
+          const hari = hariList[today.getDay()];
+          const tanggal = String(today.getDate()).padStart(2, "0");
+          const bulan = String(today.getMonth() + 1).padStart(2, "0");
+          const tahun = today.getFullYear();
+          return `${hari}, ${tanggal}/${bulan}/${tahun} 24 jam`;
+        }
+
+        // Kondisi 08:00 – 10:00 → 08:30
+        if (jam >= 8 && jam < 10) {
+          jam = 8;
+          menit = 30;
+        }
+        // Kondisi 11:00 – 14:00 → 11:30
+        else if (jam >= 11 && jam < 14) {
+          jam = 11;
+          menit = 30;
+        }
+        // Kondisi 15:55 – 18:00 → 16:00
+        else if ((jam === 15 && menit >= 55) || (jam >= 16 && jam < 18)) {
+          jam = 16;
+          menit = 0;
+        }
+        // Kondisi 20:55 – 23:59 → 21:00
+        else if ((jam === 20 && menit >= 55) || (jam > 20 && jam <= 23)) {
+          jam = 21;
+          menit = 0;
+        }
+
+        // Format hari dan tanggal
         const hari = hariList[today.getDay()];
         const tanggal = String(today.getDate()).padStart(2, "0");
         const bulan = String(today.getMonth() + 1).padStart(2, "0");
         const tahun = today.getFullYear();
-        return `${hari}, ${tanggal}-${bulan}-${tahun}`;
+        const jamStr = String(jam).padStart(2, "0");
+        const menitStr = String(menit).padStart(2, "0");
+
+        return `${hari}, ${tanggal}/${bulan}/${tahun} | ${jamStr}:${menitStr}`;
       }
 
       // Tangkap form submit
@@ -85,7 +158,9 @@
 
           // Ambil nilai dari input dan konversi ke angka
           const spend = parseFloat(document.getElementById("spend").value);
-          const lead_oo = parseFloat(document.getElementById("lead_oo").value);
+          const lead_scalev = parseFloat(
+            document.getElementById("lead_scalev").value
+          );
           const lead_real = parseFloat(
             document.getElementById("lead_real").value
           );
@@ -94,10 +169,10 @@
           // Siapkan hasil
           const hasilList = [
             ["Spend Ads", spend.toLocaleString("id-ID")],
-            ["Lead OO", lead_oo],
+            ["Lead SCALEV", lead_scalev],
             [
-              "CPL OO",
-              Number((spend / lead_oo).toFixed(0)).toLocaleString("id-ID"),
+              "CPL SCALEV",
+              Number((spend / lead_scalev).toFixed(0)).toLocaleString("id-ID"),
             ],
             ["LEAD Real", lead_real],
             [
