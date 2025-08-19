@@ -26,13 +26,9 @@
             /></label>
           </div>
           <div class="mb-3">
-            <label for="lead_scalev" class="form-label w-100"
-              >LEAD SCALEV:
-              <input
-                type="number"
-                class="form-control"
-                id="lead_scalev"
-                required
+            <label for="lead_oo" class="form-label w-100"
+              >LEAD OO:
+              <input type="number" class="form-control" id="lead_oo" required
             /></label>
           </div>
           <div class="mb-3">
@@ -158,9 +154,7 @@
 
           // Ambil nilai dari input dan konversi ke angka
           const spend = parseFloat(document.getElementById("spend").value);
-          const lead_scalev = parseFloat(
-            document.getElementById("lead_scalev").value
-          );
+          const lead_oo = parseFloat(document.getElementById("lead_oo").value);
           const lead_real = parseFloat(
             document.getElementById("lead_real").value
           );
@@ -169,10 +163,10 @@
           // Siapkan hasil
           const hasilList = [
             ["Spend Ads", spend.toLocaleString("id-ID")],
-            ["Lead SCALEV", lead_scalev],
+            ["Lead OO", lead_oo],
             [
-              "CPL SCALEV",
-              Number((spend / lead_scalev).toFixed(0)).toLocaleString("id-ID"),
+              "CPL OO",
+              Number((spend / lead_oo).toFixed(0)).toLocaleString("id-ID"),
             ],
             ["LEAD Real", lead_real],
             [
