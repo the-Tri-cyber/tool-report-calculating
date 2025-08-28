@@ -19,6 +19,7 @@
         <p class="pb-5 text-center">created by ATF</p>
 
         <form id="formHitung" class="border rounded shadow p-4 bg-white">
+          <h5 class="text-center pb-3">FORM</h5>
           <div class="mb-3">
             <label for="spend" class="form-label w-100"
               >SPEND ADS:
@@ -38,11 +39,41 @@
             /></label>
           </div>
           <div class="mb-3">
+            <label for="jml_closing" class="form-label w-100"
+              >JUMLAH CLOSING:
+              <input
+                type="number"
+                class="form-control"
+                id="jml_closing"
+                required
+            /></label>
+          </div>
+          <div class="mb-3">
             <label for="omset" class="form-label w-100"
               >OMSET:
               <input type="number" class="form-control" id="omset" required
             /></label>
           </div>
+
+          <!-- messenger ai -->
+          <h5 class="text-center pb-3">Messenger AI</h5>
+          <div class="mb-3">
+            <label for="spend_msg" class="form-label w-100"
+              >SPEND ADS:
+              <input type="number" class="form-control" id="spend_msg"
+            /></label>
+          </div>
+          <div class="mb-3">
+            <label for="lead_msg" class="form-label w-100"
+              >LEAD: <input type="number" class="form-control" id="lead_msg"
+            /></label>
+          </div>
+          <div class="mb-3">
+            <label for="omset_msg" class="form-label w-100"
+              >OMSET: <input type="number" class="form-control" id="omset_msg"
+            /></label>
+          </div>
+
           <div class="mb-2">
             <button
               type="submit"
@@ -158,27 +189,77 @@
           const lead_real = parseFloat(
             document.getElementById("lead_real").value
           );
+          const jml_closing = parseFloat(
+            document.getElementById("jml_closing").value
+          );
           const omset = parseFloat(document.getElementById("omset").value);
+          const spend_msg = parseFloat(
+            document.getElementById("spend_msg").value
+          );
+          const lead_msg = parseFloat(
+            document.getElementById("lead_msg").value
+          );
+          const omset_msg = parseFloat(
+            document.getElementById("omset_msg").value
+          );
 
-          // Siapkan hasil
+          // Hitungan dasar
+          const spendForm = spend; // iklan form
+          const spendMsg = spend_msg; // iklan messenger
+          const spendFormPPN = spendForm * 1.04;
+          const spendMsgPPN = spendMsg * 1.04;
+          const spendALL = (spendForm + spendMsg) * 1.04;
+          const omsetALL = omset + omset_msg;
+
           const hasilList = [
-            ["Spend Ads", spend.toLocaleString("id-ID")],
+            // --- FORM / OO ---
+            ["=== FORM ADS ===", ""],
+            ["Spend Ads", spendForm.toLocaleString("id-ID")],
             ["Lead OO", lead_oo],
             [
               "CPL OO",
-              Number((spend / lead_oo).toFixed(0)).toLocaleString("id-ID"),
+              Number((spendForm / lead_oo).toFixed(0)).toLocaleString("id-ID"),
             ],
             ["LEAD Real", lead_real],
             [
               "CPL Real",
-              Number((spend / lead_real).toFixed(0)).toLocaleString("id-ID"),
+              Number((spendForm / lead_real).toFixed(0)).toLocaleString(
+                "id-ID"
+              ),
+            ],
+            ["CR", ((jml_closing / lead_real) * 100).toFixed(2) + "%"],
+            [
+              "CPP",
+              Number((spendForm / jml_closing).toFixed(0)).toLocaleString(
+                "id-ID"
+              ),
             ],
             [
               "Spend + PPN",
-              Number((spend + spend * 0.04).toFixed(0)).toLocaleString("id-ID"),
+              Number(spendFormPPN.toFixed(0)).toLocaleString("id-ID"),
             ],
             ["Omset", omset.toLocaleString("id-ID")],
-            ["ROAS", (omset / (spend + spend * 0.04)).toFixed(2)],
+            ["ROAS", (omset / spendFormPPN).toFixed(2)],
+
+            // --- MESSENGER / AI ---
+            ["=== MESSENGER AI ===", ""],
+            ["Spend Ads", spendMsg.toLocaleString("id-ID")],
+            ["Lead", lead_msg.toLocaleString("id-ID")],
+            ["Omset", omset_msg.toLocaleString("id-ID")],
+            [
+              "Spend + PPN",
+              Number(spendMsgPPN.toFixed(0)).toLocaleString("id-ID"),
+            ],
+            ["ROAS", (omset_msg / spendMsgPPN).toFixed(2)],
+
+            // --- TOTAL ---
+            ["=== TOTAL ===", ""],
+            [
+              "Spend ALL (+PPN)",
+              Number(spendALL.toFixed(0)).toLocaleString("id-ID"),
+            ],
+            ["Omset ALL", omsetALL.toLocaleString("id-ID")],
+            ["ROAS ALL", (omsetALL / spendALL).toFixed(2)],
           ];
 
           // Hitung panjang label terpanjang
@@ -193,9 +274,13 @@
               const labelRapi = label.padEnd(maxLabelLength, " ");
               const baris = `${labelRapi} = ${nilai}`;
 
-              // Tambahkan baris kosong setelah "CPL Real"
-              if (label === "CPL Real") {
+              // Tambahkan baris kosong setelah "CPP"
+              if (label === "CPP") {
                 return `${baris}\n`;
+              }
+              // Tambahkan baris kosong setelah "CPP"
+              if (label === "ROAS") {
+                return `${baris}\n\n`;
               }
 
               return baris;
